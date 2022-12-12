@@ -184,6 +184,117 @@ A successful request will return the following JSON response and properties:
 | mssg           |  String |  The message from the server|
 | link           |  String |  The link to use for the payment|
 
+
+## Hosted Payment Link v2
+
+This endpoint should be used in server side to secure your apikey
+
+for Sandbox text use your Sandbox APIKEY
+
+```javascript
+
+import axios from "axios";
+
+var config = {
+        method: 'POST',
+        url: "https://secure.lyomerchant.com/api/v2/createPayment",
+        data: {
+              networkType   :   "63442272bbdc48dda8544175",
+              orderid       :   "22222",
+              callbackurl   :   "https://app.google.com/",
+              apiredirecturl:   "https://app.google.com/",
+              errorurl      :   "https://app.google.com/" ,
+              amount        :    10,
+              payment_reason:   "CUstom paymnt"
+        }
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'apikey': "8482832asaxxxxxxxxxxx",
+            'appMode': "Sandbox" // Sandbox | Live
+        },
+};
+return axios(config)
+```
+
+```php
+
+$data = [
+    'networkType' => "63442272bbdc48dda8544175",
+    'orderid' => "22222",
+    'amount' => 250,
+    'callbackurl' => "https://example.com",
+    'payment_reason' => "Payment for checkout product",
+    'apiredirecturl' => "https://example.com/thankyou",
+    'errorurl' => "https://example.com/error",
+];
+
+$curl = curl_init();
+$url = "https://secure.lyomerchant.com/api/v1/createPayment";
+curl_setopt($curl, CURLOPT_POST, TRUE);
+
+$data = http_build_query($data);
+
+curl_setopt($curl, CURLOPT_URL, $url);
+curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+    'Content-Type: application/x-www-form-urlencoded',
+    'apikey: 8482832asaxxxxxxxxxxx',
+    'appMode: Sandbox' // Sandbox | Live
+));
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, true);
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+$result = curl_exec($curl);
+
+$result = (array) json_decode($result, true);
+```
+
+```shell
+curl -X 'POST' \
+  'https://secure.lyomerchant.com/api/v1/createPayment' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded'
+```
+
+### Path Parameters
+
+| Parameter | type  | Required  | Description |
+|-----------|-------| ----------- | ----------- |
+| networkType    |	String |	No |	A unique string that identifies th network ID |
+| amount    |	float |	Yes |	The total fiat amount to pay |
+| payment_reason    |	String |	Yes |	The short description. |
+| apiredirecturl    |	String |	Yes |	The redirection link in case of successfull payment |
+| errorurl    |	String |	Yes |	The redirection link in case of error or cancelation. |
+| apikey    |	String |	Yes |	A unique string that identifies the merchant. |
+| appMode    |	String |	Yes |	A unique string that define the mode you want to use. default is Sandbox |
+
+
+This endpoint returns the payment link that will be used for online payment with LYOMERCHANT Gateway 
+
+The generated link is valid for 10 minutes
+
+> The above commands returns JSON structured like this:
+
+```json
+    {
+       "status": 200,
+       "mssg": "ok",
+       "data": {
+          "link": "https://secure.lyomerchant.com/paylink/631887d9af531bdbc3b5ab33"
+        }
+    }
+```
+### Response schema
+A successful request will return the following JSON response and properties:
+
+| Property          |  Type   |  Description     |
+|-------------------|---------| -------------------------------- |
+| status             |  int |  The status for the request 200 if succeded and 400 if error occured|
+| mssg           |  String |  The message from the server|
+| link           |  String |  The link to use for the payment|
+
+
 # API
 
 Our cryptocurrency API offers instant payment notifications (IPN), and it simplifies customized integration of our crypto payment service into your website, platform, or mobile app. 
@@ -598,7 +709,7 @@ $networkType = $network_id;
 $callbackURL = 'your_callback_url';
 $apiredirecturl = "app redirection link for success";
 $errorurl = "app redirection link for error";
-$token = "your order token";
+$token = "your custom order token to identify your transaction in callback call";
 $currency = "AED";
 $amount = "crypto_amount";
 
@@ -657,13 +768,13 @@ Call this request to get wallet for deposit and transaction validity
 | Parameter | type  | Required  | Description |
 |-----------|-------| ----------- | ----------- |
 | orderid    |	String |	Yes |	A unique string that identifies you order |
-| apiredirecturl    |	String |	no| |
+| apiredirecturl    |	String |	No| |
 | networkType    |	String |	Yes |	the network id used for the payment. |
 | callbackURL    |	String |	No |	the link where the confirmation IPN will be sent. |
-| token    |	String |	Yes |	A unique string that identifies you client |
-| currency    |	String |	Yes |	A string that identifies the currency used. |
+| token    |	String |	No |	your custom order token to identify your transaction in callback call |
+| currency    |	String |	No |	A string that identifies the currency used. |
 | amount    |	String |	Yes |	the amount to pay. |
-| errorurl    |	String |	no | |
+| errorurl    |	String |	No | |
 
 > The above commands returns JSON structured like this:
 
@@ -817,7 +928,7 @@ Call this request to get realtime transaction status through the socket
 
    let websocketurl = 'wss://sandbox.api.lyomerchant.com:5010?transkey=' + transactionID + '&apikey=' + apikey + '&hash=' + hash
 
-   // use this endpoint for the LIve : wss://staging.api.lyomerchant.com:5010
+   // use this endpoint for the LIve : wss://api.lyomerchant.com:5010
 
    if (window.WebSocket) {
         socket = new WebSocket(websocketurl);
