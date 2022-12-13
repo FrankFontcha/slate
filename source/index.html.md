@@ -185,7 +185,7 @@ A successful request will return the following JSON response and properties:
 | link           |  String |  The link to use for the payment|
 
 
-## Hosted Payment Link v2
+## TOPUP Payment Link
 
 This endpoint should be used in server side to secure your apikey
 
@@ -204,8 +204,7 @@ var config = {
               callbackurl   :   "https://app.google.com/",
               apiredirecturl:   "https://app.google.com/",
               errorurl      :   "https://app.google.com/" ,
-              amount        :    10,
-              payment_reason:   "CUstom paymnt"
+              amount        :    10
         }
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -223,7 +222,6 @@ $data = [
     'orderid' => "22222",
     'amount' => 250,
     'callbackurl' => "https://example.com",
-    'payment_reason' => "Payment for checkout product",
     'apiredirecturl' => "https://example.com/thankyou",
     'errorurl' => "https://example.com/error",
 ];
@@ -261,9 +259,9 @@ curl -X 'POST' \
 
 | Parameter | type  | Required  | Description |
 |-----------|-------| ----------- | ----------- |
-| networkType    |	String |	No |	A unique string that identifies th network ID |
-| amount    |	float |	Yes |	The total fiat amount to pay |
-| payment_reason    |	String |	Yes |	The short description. |
+| networkType    |	String |	Yes |	The unique string that identify the network ID got in networks endpoint |
+| amount    |	float |	Yes |	The total crypto amount to pay |
+| callbackurl    |	String |	Yes |	The link used for the webhook response in case of success payment |
 | apiredirecturl    |	String |	Yes |	The redirection link in case of successfull payment |
 | errorurl    |	String |	Yes |	The redirection link in case of error or cancelation. |
 | apikey    |	String |	Yes |	A unique string that identifies the merchant. |
@@ -281,7 +279,7 @@ The generated link is valid for 10 minutes
        "status": 200,
        "mssg": "ok",
        "data": {
-          "link": "https://secure.lyomerchant.com/paylink/631887d9af531bdbc3b5ab33"
+          "link": "https://topup.lyomerchant.com/pay/63973a2bc22386e89fc12167"
         }
     }
 ```
